@@ -85,7 +85,7 @@ mongoose.connect('mongodb://localhost:27018/blog', function(err) {
 ```
 # mongoose做表结构和表模型
 
-参见文件：[mongoose做表结构和表模型](./mongoose做表结构和表模型)
+参见文件：[mongoose做表结构和表模型](../Mongo/mongoose做表结构和表模型)
 
 文件如下
 
