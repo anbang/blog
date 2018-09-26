@@ -28,7 +28,80 @@ props: [
 
 具体写法如下图
 
+![](./img/props01.png)
+
 ### home.vue的
 
+```vue
+<template>
+  <div class="card">
+    <quick-nav></quick-nav>
+    <feed-section :recommend_feeds="recommend_feeds"></feed-section>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    首页组件2
+  </div>
+</template>
+ 
+<script>
+  import QuickNav from '@/base/quick-nav/quick-nav.vue'
+  import FeedSection from '@/base/feed-section/feed-section.vue'
+  import {getHomeData} from '@/api/home-data.js'
+ 
+  export default {
+    data () {
+      return {
+        recommend_feeds: []
+      }
+    },
+    components: {
+      QuickNav,
+      FeedSection
+    },
+    created () {
+      this.starGetHomeData()
+    },
+    methods: {
+      starGetHomeData () {
+        getHomeData().then((res) => {
+          console.log(res.recommend_feeds)
+          this.recommend_feeds = res.recommend_feeds
+        })
+      }
+    }
+  }
+</script>
+```
+
 ### feed-section.vue中的代码
+
+```vue
+<script>
+  export default {
+    name: 'feed-section',
+    props: [
+      'recommend_feeds'
+    ],
+    data () {
+      return {
+        myData: []
+      }
+    },
+    mounted: function () {
+    },
+    methods: {
+      catchErr (e) {
+//        const sourcesImg = e.target.getAttribute('src')
+//        e.target.setAttribute('src', sourcesImg)
+        console.log(e)
+      }
+    }
+  }
+</script>
+```
 
