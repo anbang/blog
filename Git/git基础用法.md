@@ -6,7 +6,7 @@
 `git config –global user.name “Your Name Here”`
 
 邮箱配置：
-`git config –global user.email your_email@youremail.com`
+`git config –global user.email "your_email@youremail.com"`
 
 查看配置：
 `git config –list`
