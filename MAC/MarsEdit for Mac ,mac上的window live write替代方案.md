@@ -1,4 +1,4 @@
-mac下，找了一个代替windows live write的软件，但是这并不是好软件，后来切换到一个`blogger`的软件上
+mac下，找了一个代替windows live write的软件，但是这并不是好软件，后来切换到一个`blogo`的软件上
 
 代码效果如下；
 ```javascript
