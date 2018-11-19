@@ -23,7 +23,7 @@ WITH (
 TABLESPACE pg_default;
  
 ALTER TABLE public.accounts
-    OWNER to postgres;
+    OWNER to czr_pg_01;
  
 COMMENT ON COLUMN public.accounts.account
     IS '账户地址';
@@ -64,9 +64,7 @@ CREATE TABLE public.transaction
     witnessed_level bigint,
     best_parent text COLLATE pg_catalog."default",
     is_stable boolean,
-    is_fork boolean,
-    is_invalid boolean,
-    is_fail boolean,
+    status numeric,
     is_on_mc boolean,
     mci bigint,
     latest_included_mci bigint,
@@ -79,7 +77,7 @@ WITH (
 TABLESPACE pg_default;
  
 ALTER TABLE public.transaction
-    OWNER to postgres;
+    OWNER to czr_pg_01;
  
 COMMENT ON COLUMN public.transaction.hash
     IS '交易号';
@@ -128,16 +126,10 @@ COMMENT ON COLUMN public.transaction.best_parent
  
 COMMENT ON COLUMN public.transaction.is_stable
     IS 'is_stable';
- 
-COMMENT ON COLUMN public.transaction.is_fork
-    IS 'is_fork';
- 
-COMMENT ON COLUMN public.transaction.is_invalid
-    IS 'is_invalid';
- 
-COMMENT ON COLUMN public.transaction.is_fail
-    IS 'is_fail';
- 
+
+ COMMENT ON COLUMN public.transaction.status
+    IS 'status';
+
 COMMENT ON COLUMN public.transaction.is_on_mc
     IS 'is_on_mc';
  
@@ -181,7 +173,7 @@ WITH (
 TABLESPACE pg_default;
  
 ALTER TABLE public.parents
-    OWNER to postgres;
+    OWNER to czr_pg_01;
  
 COMMENT ON COLUMN public.parents.item
     IS '元素';
@@ -211,7 +203,7 @@ WITH (
 TABLESPACE pg_default;
  
 ALTER TABLE public.witness
-OWNER to postgres;
+OWNER to czr_pg_01;
  
 COMMENT ON COLUMN public.witness.item
 IS '元素';
