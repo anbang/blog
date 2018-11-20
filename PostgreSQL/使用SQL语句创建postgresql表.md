@@ -66,6 +66,7 @@ CREATE TABLE public.transaction
     is_stable boolean,
     status numeric,
     is_on_mc boolean,
+    is_witness_account boolean,
     mci bigint,
     latest_included_mci bigint,
     mc_timestamp bigint,
@@ -132,6 +133,9 @@ COMMENT ON COLUMN public.transaction.is_stable
 
 COMMENT ON COLUMN public.transaction.is_on_mc
     IS 'is_on_mc';
+
+COMMENT ON COLUMN public.transaction.is_witness_account
+    IS 'is_witness_account';
  
 COMMENT ON COLUMN public.transaction.mci
     IS 'mci';
