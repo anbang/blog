@@ -14,7 +14,6 @@ CREATE TABLE public.accounts
     account text COLLATE pg_catalog."default" NOT NULL,
     type smallint,
     balance numeric,
-    tran_count integer,
     CONSTRAINT account_pkey PRIMARY KEY (account)
 )
 WITH (
@@ -33,9 +32,6 @@ COMMENT ON COLUMN public.accounts.type
  
 COMMENT ON COLUMN public.accounts.balance
     IS '余额，单位是Wei';
- 
-COMMENT ON COLUMN public.accounts.tran_count
-    IS '交易次数';
 ```
 
 交易表创建
