@@ -216,3 +216,62 @@ COMMENT ON COLUMN public.witness.account
 IS 'account';
 ```
 
+MCI表的数据
+
+```
+-- Table: public.mci
+ 
+-- DROP TABLE public.mci;
+ 
+CREATE TABLE public.mci
+(
+    last_stable_mci numeric,
+    last_mci numeric,
+    CONSTRAINT last_stable_mci_key PRIMARY KEY (last_stable_mci)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+ 
+ALTER TABLE public.mci
+    OWNER to czr_pg_01;
+ 
+COMMENT ON COLUMN public.mci.last_stable_mci
+    IS 'last_stable_mci';
+
+COMMENT ON COLUMN public.mci.last_mci
+    IS 'last_mci';
+```
+
+timestap表的创建
+
+```
+-- Table: public.timestamp
+ 
+-- DROP TABLE public.timestamp;
+ 
+CREATE TABLE public.timestamp
+(
+    timestamp numeric,
+    type bigint,
+    count numeric,
+    CONSTRAINT timestamp_key PRIMARY KEY (timestamp)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+ 
+ALTER TABLE public.timestamp
+    OWNER to czr_pg_01;
+ 
+COMMENT ON COLUMN public.timestamp.timestamp
+    IS 'timestamp';
+ 
+COMMENT ON COLUMN public.timestamp.type
+    IS 'type';
+
+COMMENT ON COLUMN public.timestamp.count
+    IS 'count';
+```
