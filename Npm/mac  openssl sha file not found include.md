@@ -1,3 +1,5 @@
+mac  openssl sha.h file not found include <openssl sha.h>.md
+ 
 build Electron项目时候遇到的错误
 
 ```
