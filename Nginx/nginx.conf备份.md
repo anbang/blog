@@ -177,3 +177,35 @@ server {
 }
 
 ```
+
+### ssl setting
+
+```
+server {
+  listen       80;
+  listen       443 ssl;      # 对 443 端口进行 SSL 加密
+  server_name  www.axihe.com;
+  root /usr/share/nginx/axihe-web/dist;
+  index index.html;
+  location ~* ^.+\.(jpg|jpeg|gif|png|ico|css|js|pdf|txt){
+    root /usr/share/nginx/axihe-web/dist;
+  }
+
+  # 沃通生成的 SSL 证书的存放位置
+  ssl_certificate           /etc/nginx/cert/1874900_www.axihe.com.pem;
+  ssl_certificate_key       /etc/nginx/cert/1874900_www.axihe.com.key;
+  # 其他 SSL 相关设置
+  ssl_session_timeout       10m;
+  ssl_protocols             TLSv1 TLSv1.1 TLSv1.2;
+  ssl_ciphers               ECDHE-RSA-AES128-GCM-SHA256:ECDHE:ECDH:AES:HIGH:!NULL:!aNULL:!MD5:!ADH:!RC4;
+  ssl_prefer_server_ciphers on;
+
+  # 主域名和子域名都启用 HSTS，过期时间为两年
+  add_header Strict-Transport-Security "max-age=63072000; includeSubdomains; preload";
+
+  # 所有 HTTP 访问都永久重定向（301）到 HTTPS
+  if ( $scheme = http ) {
+    rewrite ^/(.*) https://$server_name/$1 permanent;
+  }
+}
+```
