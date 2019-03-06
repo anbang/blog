@@ -209,3 +209,56 @@ server {
   }
 }
 ```
+
+## 增加谷歌分析
+`/etc/nginx/conf.d/www-axihe-com`文件如下
+```
+server {
+  listen       80;
+  listen       443 ssl;      # 对 443 端口进行 SSL 加密
+  server_name  www.axihe.com;
+  root /usr/share/nginx/axihe-web/dist;
+  index index.html;
+
+  # google any start
+  userid on;
+  userid_name cid;
+  userid_domain www.axihe.com;
+  userid_path /;
+  userid_expires max;
+
+  location @ga {
+    internal;
+    proxy_method GET;
+    # UA-100341141-2
+    proxy_pass https://ssl.google-analytics.com/collect?v=1&tid=UA-100341141-2&$uid_set$uid_got&t=pageview&dh=$host&dp=$uri&uip=$remote_addr&dr=$http_referer&z=$msec;
+    proxy_set_header User-Agent $http_user_agent;
+    proxy_pass_request_headers off;
+    proxy_pass_request_body off;
+  }
+  # google any end
+
+  location ~* ^.+\.(jpg|jpeg|gif|png|ico|css|js|pdf|txt){
+    root /usr/share/nginx/axihe-web/dist;
+    # 当匹配到此 location 时，这里会异步的调用 @ga
+    post_action @ga;
+  }
+
+  # 沃通生成的 SSL 证书的存放位置
+  ssl_certificate           /etc/nginx/cert/1874900_www.axihe.com.pem;
+  ssl_certificate_key       /etc/nginx/cert/1874900_www.axihe.com.key;
+  # 其他 SSL 相关设置
+  ssl_session_timeout       10m;
+  ssl_protocols             TLSv1 TLSv1.1 TLSv1.2;
+  ssl_ciphers               ECDHE-RSA-AES128-GCM-SHA256:ECDHE:ECDH:AES:HIGH:!NULL:!aNULL:!MD5:!ADH:!RC4;
+  ssl_prefer_server_ciphers on;
+
+  # 主域名和子域名都启用 HSTS，过期时间为两年
+  add_header Strict-Transport-Security "max-age=63072000; includeSubdomains; preload";
+
+  # 所有 HTTP 访问都永久重定向（301）到 HTTPS
+  if ( $scheme = http ) {
+    rewrite ^/(.*) https://$server_name/$1 permanent;
+  }
+}
+```
