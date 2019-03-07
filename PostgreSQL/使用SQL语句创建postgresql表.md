@@ -42,6 +42,7 @@ CREATE TABLE public.transaction
 (
     pkid bigserial,
     hash text COLLATE pg_catalog."default" NOT NULL,
+    type numeric,
     "from" text COLLATE pg_catalog."default",
     "to" text COLLATE pg_catalog."default",
     amount numeric,
@@ -63,6 +64,7 @@ CREATE TABLE public.transaction
     mci bigint,
     latest_included_mci bigint,
     mc_timestamp bigint,
+    is_witness boolean,
     stable_timestamp bigint,
     CONSTRAINT pkid_pkey PRIMARY KEY (pkid)
 )
@@ -159,6 +161,8 @@ CREATE TABLE public.parents
     parents_id bigserial,
     item text COLLATE pg_catalog."default" NOT NULL,
     parent text COLLATE pg_catalog."default",
+    is_witness boolean,
+    prototype text,
     CONSTRAINT parents_id_pkey PRIMARY KEY (parents_id),
     CONSTRAINT parents_item_parent_key UNIQUE (item, parent)
 )
@@ -256,4 +260,24 @@ COMMENT ON COLUMN public.timestamp.type
 
 COMMENT ON COLUMN public.timestamp.count
     IS 'count';
+```
+
+## global
+
+```
+-- Table: public.global
+
+-- DROP TABLE public.global;
+
+CREATE TABLE public.global
+(
+    global_id bigserial,
+    key text ,
+    value numeric,
+    CONSTRAINT global_id_key PRIMARY KEY (global_id)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
 ```
