@@ -21,9 +21,6 @@ WITH (
 )
 TABLESPACE pg_default;
  
-ALTER TABLE public.accounts
-    OWNER to czr_pg_01;
- 
 COMMENT ON COLUMN public.accounts.account
     IS '账户地址';
  
@@ -66,15 +63,13 @@ CREATE TABLE public.transaction
     mci bigint,
     latest_included_mci bigint,
     mc_timestamp bigint,
+    stable_timestamp bigint,
     CONSTRAINT pkid_pkey PRIMARY KEY (pkid)
 )
 WITH (
     OIDS = FALSE
 )
 TABLESPACE pg_default;
- 
-ALTER TABLE public.transaction
-    OWNER to czr_pg_01;
  
 COMMENT ON COLUMN public.transaction.hash
     IS '交易号';
@@ -172,9 +167,6 @@ WITH (
 )
 TABLESPACE pg_default;
  
-ALTER TABLE public.parents
-    OWNER to czr_pg_01;
- 
 COMMENT ON COLUMN public.parents.item
     IS '元素';
  
@@ -202,9 +194,6 @@ WITH (
 )
 TABLESPACE pg_default;
  
-ALTER TABLE public.witness
-OWNER to czr_pg_01;
- 
 COMMENT ON COLUMN public.witness.item
 IS '元素';
  
@@ -229,9 +218,6 @@ WITH (
     OIDS = FALSE
 )
 TABLESPACE pg_default;
- 
-ALTER TABLE public.mci
-    OWNER to czr_pg_01;
  
 COMMENT ON COLUMN public.mci.last_stable_mci
     IS 'last_stable_mci';
