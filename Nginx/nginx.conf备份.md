@@ -217,31 +217,42 @@ server {
   listen       80;
   listen       443 ssl;      # 对 443 端口进行 SSL 加密
   server_name  www.axihe.com;
-  root /usr/share/nginx/axihe-web/dist;
-  index index.html;
+  # root /usr/share/nginx/axihe-web/dist;
+  # index index.html;
 
   # google any start
   userid on;
   userid_name cid;
-  userid_domain www.axihe.com;
+  userid_domain axihe.com;
   userid_path /;
   userid_expires max;
 
   location @ga {
     internal;
+    resolver 8.8.8.8 [2001:4860:4860::8888];
+
+    set $lang 'zh-cn';
+    if ( $http_accept_language ~ en ) {
+        set $lang 'en-us';
+    }
+
     proxy_method GET;
     # UA-100341141-2
-    proxy_pass https://ssl.google-analytics.com/collect?v=1&tid=UA-100341141-2&$uid_set$uid_got&t=pageview&dh=$host&dp=$uri&uip=$remote_addr&dr=$http_referer&z=$msec;
+    proxy_pass https://ssl.google-analytics.com/collect?v=1&tid=UA-100341141-2&$uid_set$uid_got&t=pageview&dh=$host&dp=$uri&uip=$remote_addr&dr=$http_referer&z=$msec&ul=$lang;
     proxy_set_header User-Agent $http_user_agent;
     proxy_pass_request_headers off;
     proxy_pass_request_body off;
   }
   # google any end
 
-  location ~* ^.+\.(jpg|jpeg|gif|png|ico|css|js|pdf|txt){
+  location / {
     root /usr/share/nginx/axihe-web/dist;
+    index index.html;
     # 当匹配到此 location 时，这里会异步的调用 @ga
-    post_action @ga;
+    if ($http_user_agent !~* "qihoobot|Baiduspider|Googlebot|Googlebot-Mobile|Googlebot-Image|Mediapartners-Google|Adsbot-Google|Feedfetcher-Google|Yahoo! Slurp|Yahoo! Slurp China|YoudaoBot|Sosospider|Sogou spider|Sogou web spider|MSNBot|ia_archiver|Tomato Bot|YiSou Spider") {
+        post_action @ga;
+    }
+    # post_action @ga;
   }
 
   # 沃通生成的 SSL 证书的存放位置
