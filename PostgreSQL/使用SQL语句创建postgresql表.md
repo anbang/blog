@@ -249,9 +249,6 @@ WITH (
 )
 TABLESPACE pg_default;
  
-ALTER TABLE public.timestamp
-    OWNER to czr_pg_01;
- 
 COMMENT ON COLUMN public.timestamp.timestamp
     IS 'timestamp';
  
