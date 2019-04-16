@@ -9,7 +9,7 @@ UPDATE accounts SET balance=$2,count=$3 WHERE account=$1
 代码如下
 
 ```javascript 1.8
-let batchUpdateSql="
+let batchUpdateSql=`
     update 
         transaction 
     set 
@@ -27,7 +27,8 @@ let batchUpdateSql="
     as tmp 
             (hash,is_free,is_stable,is_fork,is_invalid,is_fail,is_on_mc) 
     where 
-        transaction.hash = tmp.hash";
+        transaction.hash = tmp.hash
+    `;
         
 pgclient.query(batchUpdateSql, (res) => {
     //ROLLBACK
