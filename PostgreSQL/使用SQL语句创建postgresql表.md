@@ -34,6 +34,16 @@ COMMENT ON COLUMN public.accounts.balance
 COMMENT ON COLUMN public.accounts.transaction_count
     IS '交易数量，该账户相关的交易数量';
 
+
+-- Index: balance_accid_index
+
+-- DROP INDEX public.balance_accid_index;
+
+CREATE INDEX balance_accid_index
+    ON public.accounts USING btree
+    (balance, acc_id)
+    TABLESPACE pg_default;
+
 -- Index: balance_index
 
 -- DROP INDEX public.balance_index;
@@ -279,6 +289,8 @@ IS '元素';
  
 COMMENT ON COLUMN public.witness.account
 IS 'account';
+
+
 ```
 
 ## timestap表的创建
