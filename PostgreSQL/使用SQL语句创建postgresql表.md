@@ -11,9 +11,11 @@
  
 CREATE TABLE public.accounts
 (
+    acc_id bigserial,
     account text COLLATE pg_catalog."default" NOT NULL,
     type smallint,
     balance numeric,
+    transaction_count numeric,
     CONSTRAINT account_pkey PRIMARY KEY (account)
 )
 WITH (
@@ -29,9 +31,24 @@ COMMENT ON COLUMN public.accounts.type
  
 COMMENT ON COLUMN public.accounts.balance
     IS '余额，单位是Wei';
+COMMENT ON COLUMN public.accounts.transaction_count
+    IS '交易数量，该账户相关的交易数量';
+
+-- Index: balance_index
+
+-- DROP INDEX public.balance_index;
+
+CREATE INDEX balance_index
+    ON public.accounts USING btree
+    (balance)
+    TABLESPACE pg_default;
+
+COMMENT ON INDEX public.balance_index
+    IS 'balance_index';
 ```
 
-交易表创建
+
+## 交易表创建
 
 ```postgresql
 -- Table: public.transaction
@@ -50,22 +67,26 @@ CREATE TABLE public.transaction
     witness_list_block text COLLATE pg_catalog."default",
     last_summary text COLLATE pg_catalog."default",
     last_summary_block text COLLATE pg_catalog."default",
-    data text COLLATE pg_catalog."default",
+    "data" text COLLATE pg_catalog."default",
     exec_timestamp bigint,
     signature text COLLATE pg_catalog."default",
     is_free boolean,
-    level bigint,
+    "level" bigint,
     witnessed_level bigint,
     best_parent text COLLATE pg_catalog."default",
     is_stable boolean,
     status numeric,
     is_on_mc boolean,
-    is_witness_account boolean,
     mci bigint,
     latest_included_mci bigint,
     mc_timestamp bigint,
-    is_witness boolean,
     stable_timestamp bigint,
+    is_shown boolean,
+
+    is_witness_account boolean,
+    is_witness boolean,
+
+
     CONSTRAINT pkid_pkey PRIMARY KEY (pkid)
 )
 WITH (
@@ -97,7 +118,7 @@ COMMENT ON COLUMN public.transaction.last_summary
 COMMENT ON COLUMN public.transaction.last_summary_block
     IS 'last_summary_block';
  
-COMMENT ON COLUMN public.transaction.data
+COMMENT ON COLUMN public.transaction."data"
     IS '数据';
  
 COMMENT ON COLUMN public.transaction.exec_timestamp
@@ -109,7 +130,7 @@ COMMENT ON COLUMN public.transaction.signature
 COMMENT ON COLUMN public.transaction.is_free
     IS 'is_free';
  
-COMMENT ON COLUMN public.transaction.level
+COMMENT ON COLUMN public.transaction."level"
     IS 'level';
  
 COMMENT ON COLUMN public.transaction.witnessed_level
@@ -126,9 +147,6 @@ COMMENT ON COLUMN public.transaction.is_stable
 
 COMMENT ON COLUMN public.transaction.is_on_mc
     IS 'is_on_mc';
-
-COMMENT ON COLUMN public.transaction.is_witness_account
-    IS 'is_witness_account';
  
 COMMENT ON COLUMN public.transaction.mci
     IS 'mci';
@@ -138,18 +156,78 @@ COMMENT ON COLUMN public.transaction.latest_included_mci
  
 COMMENT ON COLUMN public.transaction.mc_timestamp
     IS 'mc_timestamp';
- 
+
+
+-- Index: from_index
+
+-- DROP INDEX public.from_index;
+
+CREATE INDEX from_index
+    ON public.transaction USING btree
+    ("from")
+    TABLESPACE pg_default;
+
+COMMENT ON INDEX public.from_index
+    IS 'from_index';
+
 -- Index: hash_index
- 
+
 -- DROP INDEX public.hash_index;
- 
+
 CREATE UNIQUE INDEX hash_index
     ON public.transaction USING btree
-    (hash COLLATE pg_catalog."default")
+    (hash)
     TABLESPACE pg_default;
+
+-- Index: is_shown_index
+
+-- DROP INDEX public.is_shown_index;
+
+CREATE INDEX is_shown_index
+    ON public.transaction USING btree
+    (is_shown)
+    TABLESPACE pg_default;
+
+-- Index: latest_transaction_index
+
+-- DROP INDEX public.latest_transaction_index;
+
+CREATE INDEX latest_transaction_index
+    ON public.transaction USING btree
+    (exec_timestamp, level, pkid)
+    TABLESPACE pg_default;
+
+COMMENT ON INDEX public.latest_transaction_index
+    IS 'latest_transaction_index';
+
+-- Index: to_index
+
+-- DROP INDEX public.to_index;
+
+CREATE INDEX to_index
+    ON public.transaction USING btree
+    ("to")
+    TABLESPACE pg_default;
+
+COMMENT ON INDEX public.to_index
+    IS 'to_index';
+
+-- Index: witness_transaction_index
+
+-- DROP INDEX public.witness_transaction_index;
+
+CREATE INDEX witness_transaction_index
+    ON public.transaction USING btree
+    (exec_timestamp, level, pkid)
+    TABLESPACE pg_default    WHERE type = 1::numeric
+;
+
+COMMENT ON INDEX public.witness_transaction_index
+    IS 'witness_transaction_index, exec_timestamp desc, level desc, pkid desc';
+
 ```
 
-parent表创建
+## parent表创建
 
 ```postgresql
 -- Table: public.parents
@@ -161,8 +239,6 @@ CREATE TABLE public.parents
     parents_id bigserial,
     item text COLLATE pg_catalog."default" NOT NULL,
     parent text COLLATE pg_catalog."default",
-    is_witness boolean,
-    prototype text,
     CONSTRAINT parents_id_pkey PRIMARY KEY (parents_id),
     CONSTRAINT parents_item_parent_key UNIQUE (item, parent)
 )
@@ -178,7 +254,7 @@ COMMENT ON COLUMN public.parents.parent
     IS 'parent';
 ```
 
-witness表的创建
+## witness表的创建
 
 ```postgresql
 -- Table: public.witness
@@ -205,32 +281,7 @@ COMMENT ON COLUMN public.witness.account
 IS 'account';
 ```
 
-MCI表的数据
-
-```
--- Table: public.mci
- 
--- DROP TABLE public.mci;
- 
-CREATE TABLE public.mci
-(
-    last_stable_mci numeric,
-    last_mci numeric,
-    CONSTRAINT last_stable_mci_key PRIMARY KEY (last_stable_mci)
-)
-WITH (
-    OIDS = FALSE
-)
-TABLESPACE pg_default;
- 
-COMMENT ON COLUMN public.mci.last_stable_mci
-    IS 'last_stable_mci';
-
-COMMENT ON COLUMN public.mci.last_mci
-    IS 'last_mci';
-```
-
-timestap表的创建
+## timestap表的创建
 
 ```
 -- Table: public.timestamp
@@ -259,6 +310,7 @@ COMMENT ON COLUMN public.timestamp.count
     IS 'count';
 ```
 
+
 ## global
 
 ```
@@ -277,4 +329,37 @@ WITH (
     OIDS = FALSE
 )
 TABLESPACE pg_default;
+```
+
+
+-----------------------------------------
+
+## 下面是废弃的表，无需创建的
+
+
+**MCI表的数据**
+
+(这个已经移到global表了，不需要了)
+
+```
+-- Table: public.mci
+ 
+-- DROP TABLE public.mci;
+ 
+CREATE TABLE public.mci
+(
+    last_stable_mci numeric,
+    last_mci numeric,
+    CONSTRAINT last_stable_mci_key PRIMARY KEY (last_stable_mci)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+ 
+COMMENT ON COLUMN public.mci.last_stable_mci
+    IS 'last_stable_mci';
+
+COMMENT ON COLUMN public.mci.last_mci
+    IS 'last_mci';
 ```
